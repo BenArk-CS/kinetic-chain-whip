@@ -91,4 +91,4 @@ That said, the speed margin was only a few percent, and I believe that's because
 
 ## AI usage
 
-I used an AI assistant (Claude) on this project to help decide on the open-loop CMA-ES approach over RL, pick hyperparameters (sigma0 = 0.5, popsize = 16, horizon), write and debug the code, and design the reward. The body XML is AI-generated and then tuned by hand. It also helped write and organize this README and structure the results and limitations clearly.
+I used an AI assistant (Claude) on this project to help decide on the open-loop CMA-ES approach over RL, pick hyperparameters (sigma0 = 0.5, popsize = 16, horizon), debug and clean up the code, and design the reward. The body XML is AI-generated and then tuned by hand. It also helped write and organize this README and structure the results and limitations clearly.
