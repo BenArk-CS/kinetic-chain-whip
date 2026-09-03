@@ -1,0 +1,70 @@
+<mujoco model="kinetic_chain_whip">
+
+<!--
+  five-hinge kinetic chain (hips -> torso -> shoulder -> elbow -> wrist/fist) that whips
+  in the horizontal plane to strike a free target block, used to test proximal-to-distal
+  timing against brute force. body/geometry mostly claude-generated, tuned by hand.
+-->
+
+  <!-- physics step and gravity, inertia auto-computed from the capsule geoms -->
+  <option timestep="0.002" gravity="0 0 -9.81"/>
+
+  <!-- all hinges rotate about z so the chain whips in the horizontal plane -->
+  <!-- damping and frictionloss set here, mujoco never adds them for you -->
+  <default>
+    <joint type="hinge" axis="0 0 1" damping="0.5" frictionloss="0.1" limited="false"/>
+    <geom rgba="0.7 0.7 0.8 1"/>
+  </default>
+
+  <worldbody>
+    <light pos="0 0 3" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="5 5 0.1" rgba="0.25 0.25 0.28 1"/>
+
+    <!-- serial chain hips -> torso -> shoulder -> elbow -> wrist/fist, pinned at origin by hip_joint -->
+    <body name="hips" pos="0 0 0.5">
+      <joint name="hip_joint"/>
+      <geom name="hip_seg" type="capsule" fromto="0 0 0 0.25 0 0" size="0.05"/>
+
+      <body name="torso" pos="0.25 0 0">
+        <joint name="torso_joint"/>
+        <geom name="torso_seg" type="capsule" fromto="0 0 0 0.25 0 0" size="0.045"/>
+
+        <body name="shoulder" pos="0.25 0 0">
+          <joint name="shoulder_joint"/>
+          <geom name="shoulder_seg" type="capsule" fromto="0 0 0 0.2 0 0" size="0.04"/>
+
+          <body name="elbow" pos="0.2 0 0">
+            <joint name="elbow_joint"/>
+            <geom name="elbow_seg" type="capsule" fromto="0 0 0 0.2 0 0" size="0.035"/>
+
+            <body name="wrist" pos="0.2 0 0">
+              <joint name="wrist_joint"/>
+              <geom name="wrist_seg" type="capsule" fromto="0 0 0 0.12 0 0" size="0.03"/>
+              <!-- fist and the ee site we read speed from -->
+              <geom name="fist" type="sphere" pos="0.12 0 0" size="0.05" rgba="0.9 0.3 0.3 1"/>
+              <site name="ee" pos="0.12 0 0" size="0.012" rgba="1 1 0 1"/>
+            </body>
+          </body>
+        </body>
+      </body>
+    </body>
+
+    <!-- pedestal holds the target at fist height, on the far side so the fist starts far from it -->
+    <geom name="pedestal" type="cylinder" fromto="-0.9 0.4 0 -0.9 0.4 0.44" size="0.03" rgba="0.4 0.4 0.4 1"/>
+
+    <!-- target block, free to be knocked, mass and friction set explicitly -->
+    <body name="block" pos="-0.9 0.4 0.5">
+      <freejoint name="block_free"/>
+      <geom name="block_geom" type="box" size="0.06 0.06 0.06" mass="0.5" friction="1 0.005 0.0001" rgba="0.3 0.75 0.35 1"/>
+    </body>
+  </worldbody>
+
+  <!-- one torque motor per joint, gear scales the normalized command into real n·m -->
+  <actuator>
+    <motor name="hip_mot" joint="hip_joint" gear="40" ctrllimited="true" ctrlrange="-1 1"/>
+    <motor name="torso_mot" joint="torso_joint" gear="30" ctrllimited="true" ctrlrange="-1 1"/>
+    <motor name="shoulder_mot" joint="shoulder_joint" gear="20" ctrllimited="true" ctrlrange="-1 1"/>
+    <motor name="elbow_mot" joint="elbow_joint" gear="12" ctrllimited="true" ctrlrange="-1 1"/>
+    <motor name="wrist_mot" joint="wrist_joint" gear="6" ctrllimited="true" ctrlrange="-1 1"/>
+  </actuator>
+</mujoco>

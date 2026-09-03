@@ -1,0 +1,13 @@
+· GITIGNORE
+# virtual environment
+play_venv/
+ 
+# python cache
+__pycache__/
+*.pyc
+ 
+# old cart-pole artifacts, not part of this project
+*.zip
+evaluations.npz
+saved/tb/
+ 
